@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四六级英语学习站（单词+口语）</title>
+    <style>
+        /* 全局样式：重置默认格式+统一风格 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", Arial, sans-serif;
+        }
+        body {
+            background-color: #f8fafc; /* 淡护眼底色 */
+            color: #333; /* 主文字色，清晰不刺眼 */
+            line-height: 1.6;
+        }
+
+        /* 1. 顶部导航栏：固定顶部，简洁导航 */
+        .nav {
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05); /* 轻微阴影，更立体 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100; /* 始终在最上层，不被遮挡 */
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2563eb; /* 主色调：淡蓝色，护眼不突兀 */
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+        }
+        .nav-menu li {
+            margin-left: 30px;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s; /* hover变色过渡，更丝滑 */
+        }
+        .nav-menu a:hover {
+            color: #2563eb; /*  hover时变主色调，突出选中 */
+        }
+
+        /* 2. 首页banner：核心功能入口 */
+        .banner {
+            margin-top: 70px; /* 避开导航栏 */
+            background-color: #e0f2fe; /* 淡蓝护眼背景 */
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .banner h1 {
+            font-size: 32px;
+            color: #1e40af; /* 深蓝主色，突出标题 */
+            margin-bottom: 20px;
+        }
+        .banner p {
+            font-size: 18px;
+            color: #4b5563;
+            margin-bottom: 40px;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* 按钮间距 */
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: #2563eb; /* 主按钮：蓝色 */
+            color: #fff;
+        }
+        .btn-secondary {
+            background-color: #f97316; /* 辅助按钮：橙色，突出行动 */
+            color: #fff;
+        }
+        .btn:hover {
+            transform: translateY(-3px); /*  hover轻微上浮，有交互感 */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* 3. 核心功能区：单词记忆+发音纠错，分栏布局 */
+        .features {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 电脑端两栏平分 */
+            gap: 40px;
+        }
+        .feature-card {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: box-shadow 0.3s;
+        }
+        .feature-card:hover {
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1); /*  hover加阴影，更立体 */
+        }
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #e0f2fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .feature-icon span {
+            font-size: 24px;
+            color: #2563eb;
+        }
+        .feature-card h2 {
+            font-size: 22px;
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+        .feature-card p {
+            color: #4b5563;
+            margin-bottom: 20px;
+        }
+        .feature-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        .feature-list li {
+            color: #6b7280;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .feature-list li::before {
+            content: "✓"; /* 自定义列表符号，更清爽 */
+            color: #2563eb;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        /* ✨ 新增：单词记忆模块 - 翻转卡片样式（纯CSS实现） */
+        .word-cards {
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2张卡片并排 */
+            gap: 15px;
+        }
+        .card {
+            perspective: 1000px; /* 3D透视效果，核心！ */
+            height: 150px; /* 卡片高度 */
+            cursor: pointer;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s; /* 翻转过渡时间 */
+            transform-style: preserve-3d; /* 保持3D效果 */
+        }
+        /* 鼠标hover时翻转180度 */
+        .card:hover .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #e0f2fe;
+            backface-visibility: hidden; /* 隐藏背面，避免穿透 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .card-back {
+            transform: rotateY(180deg); /* 初始翻转背面，hover时显示 */
+            background-color: #f0f9ff;
+        }
+        .card-word {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+        .card-phonetic {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .card-example {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .card-affix {
+            font-size: 12px;
+            color: #2563eb;
+            background-color: #fff;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        /* ✨ 新增：发音纠错模块 - 立体发音按钮样式 */
+        .speech-buttons {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap; /* 手机端自动换行 */
+        }
+        .sound-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #f0f9ff;
+            color: #2563eb;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .sound-btn i {
+            font-size: 18px;
+        }
+        .sound-btn:hover {
+            transform: scale(1.05); /*  hover放大5%，更有交互感 */
+            background-color: #2563eb;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        }
+
+        /* 4. 学习进度看板：简洁数据展示 */
+        .progress {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .progress h2 {
+            font-size: 24px;
+            color: #1e40af;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 三栏数据卡片 */
+            gap: 30px;
+        }
+        .progress-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8fafc;
+        }
+        .progress-card .num {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .progress-card .text {
+            color: #4b5563;
+            font-size: 16px;
+        }
+
+        /* 5. 底部版权：简洁干净 */
+        .footer {
+            background-color: #1e40af;
+            color: #fff;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+        }
+        .footer p {
+            font-size: 14px;
+            opacity: 0.8; /* 淡一点，不抢重点 */
+        }
+
+        /* 响应式：适配手机端（关键！） */
+        @media (max-width: 768px) {
+            .features {
+                grid-template-columns: 1fr; /* 手机端单栏布局 */
+            }
+            .progress-grid {
+                grid-template-columns: 1fr 1fr; /* 手机端两栏数据卡片 */
+            }
+            .banner h1 {
+                font-size: 26px;
+            }
+            .btn-group {
+                flex-direction: column; /* 手机端按钮上下排列 */
+                width: 80%;
+                margin: 0 auto;
+            }
+            .word-cards {
+                grid-template-columns: 1fr; /* 手机端单词卡片单栏 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="logo">CET英语学习站</div>
+            <ul class="nav-menu">
+                <li><a href="#home">首页</a></li>
+                <li><a href="#word">单词记忆</a></li>
+                <li><a href="#speech">发音纠错</a></li>
+                <li><a href="#progress">学习进度</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 首页Banner -->
+    <section class="banner" id="home">
+        <h1>四六级高效学习 · 单词+口语双突破</h1>
+        <p>聚焦核心考点，轻松备考，零基础也能逆袭</p>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="location.href='#word'">开始记单词</button>
+            <button class="btn btn-secondary" onclick="location.href='#speech'">口语纠错练习</button>
+        </div>
+    </section>
+
+    <!-- 核心功能区 -->
+    <section class="features">
+        <!-- 单词记忆模块（新增翻转卡片） -->
+        <div class="feature-card" id="word">
+            <div class="feature-icon">
+                <span>📚</span>
+            </div>
+            <h2>四六级核心单词记忆</h2>
+            <p>贴合考纲核心词，按遗忘曲线规划学习，高效掌握高频考点</p>
+            <ul class="feature-list">
+                <li>四六级考纲核心词库，精准匹配考点</li>
+                <li>单词卡片+真题例句，语境化记忆</li>
+                <li>错题自动归纳，针对性复习</li>
+                <li>护眼配色，长时间学习不疲劳</li>
+            </ul>
+
+            <!-- ✨ 新增：单词翻转卡片案例（4个四六级高频词） -->
+            <div class="word-cards">
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-word">abandon</div>
+                            <div class="card-phonetic">/əˈbændən/</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="card-example">CET-4真题：He had to abandon his plan.</div>
+                            <div class="card-affix">词根：ab-(离开)+andon(给予)→放弃</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-word">numerous</div>
+                            <div class="card-phonetic">/ˈnjuːmərəs/</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="card-example">CET-4真题：Numerous students take CET-4.</div>
+                            <div class="card-affix">词根：numer(数字)+ous→大量的</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-word">facilitate</div>
+                            <div class="card-phonetic">/fəˈsɪlɪteɪt/</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="card-example">CET-6真题：It facilitates daily communication.</div>
+                            <div class="card-affix">词根：fac(做)+ilitate→使容易</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-word">sustainable</div>
+                            <div class="card-phonetic">/səˈsteɪnəbl/</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="card-example">CET-6真题：Pursue sustainable development.</div>
+                            <div class="card-affix">词根：sustain(维持)+able→可持续的</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary">查看更多单词</button>
+        </div>
+
+        <!-- 发音纠错模块（新增立体发音按钮） -->
+        <div class="feature-card" id="speech">
+            <div class="feature-icon">
+                <span>🎤</span>
+            </div>
+            <h2>口语发音精准纠错</h2>
+            <p>适配四六级口语考试，纠正发音错误，提升流利度</p>
+            <ul class="feature-list">
+                <li>常考句型跟读，贴合口语考试场景</li>
+                <li>发音准确度+语调双维度批改</li>
+                <li>错误音节标注，附口型纠正技巧</li>
+                <li>高频话题素材，针对性练习</li>
+            </ul>
+
+            <!-- ✨ 新增：立体发音练习按钮（四六级口语高频句型） -->
+            <div class="speech-buttons">
+                <button class="sound-btn">
+                    <span>🔊</span>
+                    <span>What do you think of online study?</span>
+                </button>
+                <button class="sound-btn">
+                    <span>🔊</span>
+                    <span>My campus life is very colorful.</span>
+                </button>
+                <button class="sound-btn">
+                    <span>🔊</span>
+                    <span>We should protect the environment.</span>
+                </button>
+                <button class="sound-btn">
+                    <span>🔊</span>
+                    <span>Technology changes our daily life.</span>
+                </button>
+            </div>
+
+            <button class="btn btn-secondary">开始录音练习</button>
+        </div>
+    </section>
+
+    <!-- 学习进度看板 -->
+    <section class="progress" id="progress">
+        <h2>我的学习进度</h2>
+        <div class="progress-grid">
+            <div class="progress-card">
+                <div class="num">86</div>
+                <div class="text">今日记词数</div>
+            </div>
+            <div class="progress-card">
+                <div class="num">92%</div>
+                <div class="text">发音准确率</div>
+            </div>
+            <div class="progress-card">
+                <div class="num">32</div>
+                <div class="text">已掌握单词</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部版权 -->
+    <footer class="footer">
+        <p>© 2025 CET英语学习站 | 专注四六级单词+口语高效学习</p>
+    </footer>
+</body>
+</html>
